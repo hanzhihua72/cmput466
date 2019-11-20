@@ -117,13 +117,29 @@ class LogisticReg(Classifier):
     def __init__(self, parameters={}):
         self.params = utils.update_dictionary_items(
             {'stepsize': 0.01, 'epochs': 100}, parameters)
-        self.weights = None
 
     def learn(self, X, y):
-        pass
+        self.weights = np.random.randn(X.shape[1], 1)
+
+        maxiter = self.params["epochs"]
+        for i in range(1, maxiter):
+            eta = self.params["stepsize"]/i
+            self.weights -= eta*X.T @ (utils.sigmoid(X @ self.weights) - y)
 
     def predict(self, Xtest):
-        pass
+        numsamples = Xtest.shape[0]
+        numfeatures = Xtest.shape[1]
+        predictions = []
+
+        for i in range(numsamples):
+            prob = 1/(1 + np.exp(-self.weights.T @ Xtest[i, :]))
+            if prob < 0.5:
+                predictions.append(0)
+            else:
+                predictions.append(1)
+
+        return np.reshape(predictions, [numsamples, 1])
+
 
 # Susy: ~23 error (4 hidden units)
 

@@ -80,9 +80,9 @@ if __name__ == '__main__':
 
     classalgs = {
         'Random': algs.Classifier,
-        'Naive Bayes': algs.NaiveBayes,
+        # 'Naive Bayes': algs.NaiveBayes,
         # 'Linear Regression': algs.LinearRegressionClass,
-        # 'Logistic Regression': algs.LogisticReg,
+        'Logistic Regression': algs.LogisticReg,
         # 'Neural Network': algs.NeuralNet,
         # 'Kernel Logistic Regression': algs.KernelLogisticRegression,
     }
@@ -99,8 +99,8 @@ if __name__ == '__main__':
             {'usecolumnones': False},
         ],
         'Logistic Regression': [
-            {'stepsize': 0.001},
-            {'stepsize': 0.01},
+            {'stepsize': 1},
+            {'stepsize': 0.1},
         ],
         'Neural Network': [
             {'epochs': 100, 'nh': 4},
@@ -144,7 +144,7 @@ if __name__ == '__main__':
         for learnername, Learner in classalgs.items():
             params = parameters.get(learnername, [None])
             best_parameters[learnername] = cross_validate(
-                2, Xtrain, Ytrain, Learner, params)
+                5, Xtrain, Ytrain, Learner, params)
 
         for learnername, Learner in classalgs.items():
             params = best_parameters[learnername]
