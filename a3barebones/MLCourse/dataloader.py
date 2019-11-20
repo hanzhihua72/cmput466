@@ -33,14 +33,14 @@ def load_census(trainsize=1000, testsize=1000):
 
 def load_susy(trainsize=500, testsize=1000):
     """ A physics classification dataset """
-    filename = r'C:\Users\Zhi\Desktop\a3barebones\datasets\susysubset.csv'
+    filename = r'C:\Users\Zhi\Desktop\cmput466\a3barebones\datasets\susysubset.csv'
     dataset = loadCsvDataset(filename)
     trainset, testset = splitdataset(dataset, trainsize, testsize)
     return trainset, testset
 
 def load_ctscan(trainsize=5000, testsize=5000):
     """ A CT scan dataset """
-    filename = r'C:\Users\Zhi\Desktop\a3barebones\datasets\slice_localization_data.csv'
+    filename = r'C:\Users\Zhi\Desktop\cmput466\a3barebones\datasets\slice_localization_data.csv'
     dataset = loadCsvDataset(filename)
     trainset, testset = splitdataset(dataset, trainsize, testsize, featureoffset=1)
     return trainset, testset

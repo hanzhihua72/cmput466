@@ -4,6 +4,7 @@ import MLCourse.dataloader as dtl
 import MLCourse.utilities as utils
 import classalgorithms as algs
 
+
 def getaccuracy(ytest, predictions):
     correct = 0
     # count number of correct predictions
@@ -11,8 +12,10 @@ def getaccuracy(ytest, predictions):
     # return percent correct
     return (correct / float(len(ytest))) * 100
 
+
 def geterror(ytest, predictions):
     return (100 - getaccuracy(ytest, predictions))
+
 
 """ k-fold cross-validation
 K - number of folds
@@ -24,11 +27,27 @@ parameters - a list of parameter dictionaries to test
 NOTE: utils.leaveOneOut will likely be useful for this problem.
 Check utilities.py for example usage.
 """
+
+
 def cross_validate(K, X, Y, Algorithm, parameters):
     all_errors = np.zeros((len(parameters), K))
+
     for k in range(K):
+        Xarrays = np.split(X, K)
+        Yarrays = np.split(Y, K)
+
+        Xtest = Xarrays.pop(k)
+        ytest = Yarrays.pop(k)
+
+        Xtrain = np.concatenate(Xarrays)
+        ytrain = np.concatenate(Yarrays)
+
         for i, params in enumerate(parameters):
-            pass
+            algorithm = Algorithm(params)
+            algorithm.learn(Xtrain, ytrain)
+            predictions = algorithm.predict(Xtest)
+
+            all_errors[i, k] = geterror(ytest, predictions)
 
     avg_errors = np.mean(all_errors, axis=1)
     for i, params in enumerate(parameters):
@@ -37,6 +56,7 @@ def cross_validate(K, X, Y, Algorithm, parameters):
 
     best_parameters = parameters[0]
     return best_parameters
+
 
 if __name__ == '__main__':
 
@@ -58,15 +78,13 @@ if __name__ == '__main__':
     numruns = args.numruns
     dataset = args.dataset
 
-
-
     classalgs = {
-        #'Random': algs.Classifier,
+        'Random': algs.Classifier,
         'Naive Bayes': algs.NaiveBayes,
-        #'Linear Regression': algs.LinearRegressionClass,
-        #'Logistic Regression': algs.LogisticReg,
-        #'Neural Network': algs.NeuralNet,
-        #'Kernel Logistic Regression': algs.KernelLogisticRegression,
+        # 'Linear Regression': algs.LinearRegressionClass,
+        # 'Logistic Regression': algs.LogisticReg,
+        # 'Neural Network': algs.NeuralNet,
+        # 'Kernel Logistic Regression': algs.KernelLogisticRegression,
     }
     numalgs = len(classalgs)
 
@@ -76,25 +94,25 @@ if __name__ == '__main__':
         # name of the algorithm to run
         'Naive Bayes': [
             # first set of parameters to try
-            { 'usecolumnones': True },
+            {'usecolumnones': True},
             # second set of parameters to try
-            { 'usecolumnones': False },
+            {'usecolumnones': False},
         ],
         'Logistic Regression': [
-            { 'stepsize': 0.001 },
-            { 'stepsize': 0.01 },
+            {'stepsize': 0.001},
+            {'stepsize': 0.01},
         ],
         'Neural Network': [
-            { 'epochs': 100, 'nh': 4 },
-            { 'epochs': 100, 'nh': 8 },
-            { 'epochs': 100, 'nh': 16 },
-            { 'epochs': 100, 'nh': 32 },
+            {'epochs': 100, 'nh': 4},
+            {'epochs': 100, 'nh': 8},
+            {'epochs': 100, 'nh': 16},
+            {'epochs': 100, 'nh': 32},
         ],
         'Kernel Logistic Regression': [
-            { 'centers': 10, 'stepsize': 0.01 },
-            { 'centers': 20, 'stepsize': 0.01 },
-            { 'centers': 40, 'stepsize': 0.01 },
-            { 'centers': 80, 'stepsize': 0.01 },
+            {'centers': 10, 'stepsize': 0.01},
+            {'centers': 20, 'stepsize': 0.01},
+            {'centers': 40, 'stepsize': 0.01},
+            {'centers': 80, 'stepsize': 0.01},
         ]
     }
 
@@ -107,7 +125,7 @@ if __name__ == '__main__':
         if dataset == "susy":
             trainset, testset = dtl.load_susy(trainsize, testsize)
         elif dataset == "census":
-            trainset, testset = dtl.load_census(trainsize,testsize)
+            trainset, testset = dtl.load_census(trainsize, testsize)
         else:
             raise ValueError("dataset %s unknown" % dataset)
 
@@ -124,8 +142,9 @@ if __name__ == '__main__':
 
         best_parameters = {}
         for learnername, Learner in classalgs.items():
-            params = parameters.get(learnername, [ None ])
-            best_parameters[learnername] = cross_validate(10, Xtrain, Ytrain, Learner, params)
+            params = parameters.get(learnername, [None])
+            best_parameters[learnername] = cross_validate(
+                2, Xtrain, Ytrain, Learner, params)
 
         for learnername, Learner in classalgs.items():
             params = best_parameters[learnername]
