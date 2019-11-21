@@ -79,11 +79,11 @@ if __name__ == '__main__':
     dataset = args.dataset
 
     classalgs = {
-        'Random': algs.Classifier,
+        # 'Random': algs.Classifier,
         # 'Naive Bayes': algs.NaiveBayes,
         # 'Linear Regression': algs.LinearRegressionClass,
-        'Logistic Regression': algs.LogisticReg,
-        # 'Neural Network': algs.NeuralNet,
+        # 'Logistic Regression': algs.LogisticReg,
+        'Neural Network': algs.NeuralNet,
         # 'Kernel Logistic Regression': algs.KernelLogisticRegression,
     }
     numalgs = len(classalgs)
@@ -104,9 +104,9 @@ if __name__ == '__main__':
         ],
         'Neural Network': [
             {'epochs': 100, 'nh': 4},
-            {'epochs': 100, 'nh': 8},
-            {'epochs': 100, 'nh': 16},
-            {'epochs': 100, 'nh': 32},
+            #    {'epochs': 100, 'nh': 8},
+            #    {'epochs': 100, 'nh': 16},
+            #    {'epochs': 100, 'nh': 32},
         ],
         'Kernel Logistic Regression': [
             {'centers': 10, 'stepsize': 0.01},

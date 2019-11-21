@@ -71,7 +71,7 @@ class NaiveBayes(Classifier):
             numsamples = Xtrain.shape[0]
             numfeatures = Xtrain.shape[1]
 
-            #print(Xtrain.shape, ytrain.shape)
+            # print(Xtrain.shape, ytrain.shape)
 
             # Compute the prior
             self.prior = np.zeros((2))
@@ -132,7 +132,7 @@ class LogisticReg(Classifier):
         predictions = []
 
         for i in range(numsamples):
-            prob = 1/(1 + np.exp(-self.weights.T @ Xtest[i, :]))
+            prob = utils.sigmoid(self.weights.T @ Xtest[i, :])
             if prob < 0.5:
                 predictions.append(0)
             else:
@@ -142,7 +142,6 @@ class LogisticReg(Classifier):
 
 
 # Susy: ~23 error (4 hidden units)
-
 
 class NeuralNet(Classifier):
     def __init__(self, parameters={}):
@@ -161,14 +160,59 @@ class NeuralNet(Classifier):
             raise Exception(
                 'NeuralNet -> can only handle sigmoid transfer, must set option transfer to string sigmoid')
 
-        self.wi = None
-        self.wo = None
-
     def learn(self, Xtrain, ytrain):
-        pass
+        numfeatures = Xtrain.shape[1]
+        numsamples = Xtrain.shape[0]
+        nh = self.params['nh']
+
+        self.w2 = np.random.randn(numfeatures, nh)
+        self.w1 = np.random.randn(nh, 1)
+
+        maxiter = self.params["epochs"]
+
+        delta_1 = np.zeros((nh))
+        delta_2 = np.zeros((numfeatures))
+
+        x_shuffle = np.concatenate([Xtrain, ytrain], axis=1)
+        for i in range(maxiter):
+
+            np.random.shuffle(x_shuffle)
+            Xtrain = x_shuffle[:, :numfeatures]
+            ytrain = x_shuffle[:, numfeatures]
+
+            for n in range(numsamples):
+                x = Xtrain[n, :]
+
+                h = self.transfer(x @ self.w2)
+                yhat = self.transfer(h @ self.w1)
+
+                for k in range(nh):
+                    delta_1 = yhat - ytrain[n]
+                    self.w1[k, 0] -= delta_1*h[k]
+
+                for k in range(nh):
+                    for j in range(numfeatures):
+                        delta_2[k] = (self.w1[k, 0] * delta_1)*h[k]*(1-h[k])
+                        self.w2[j, k] -= delta_2[k]*x[j]
+            if i % 20 == 0:
+                print(i)
 
     def predict(self, Xtest):
-        pass
+        numsamples = Xtest.shape[0]
+        numfeatures = Xtest.shape[1]
+        predictions = []
+
+        for i in range(numsamples):
+            x = Xtest[i]
+
+            h = self.transfer(x @ self.w2)
+            yhat = self.transfer(h @ self.w1)
+
+            if yhat < 0.5:
+                predictions.append(0)
+            else:
+                predictions.append(1)
+        return np.reshape(predictions, [numsamples, 1])
 
     def evaluate(self, inputs):
         # hidden activations
