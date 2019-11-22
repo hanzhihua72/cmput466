@@ -51,19 +51,23 @@ def cross_validate(K, X, Y, Algorithm, parameters):
             predictions = algorithm.predict(Xtest)
 
             all_errors[i, k] = geterror(ytest, predictions)
-
+            print(f'{Algorithm.__name__} Cross validate parameters : {params} error: {all_errors[i, k]} run {k+1}/{K}, parameters {i+1}/{len(parameters)}')
+    
     avg_errors = np.mean(all_errors, axis=1)
 
     runs = []
+    lowest_error = np.inf
+    best_parameters = parameters[0]
     for i, params in enumerate(parameters):
         runs.append({'name': Algorithm.__name__, 'params': params,
-                     'average_error': avg_errors[i]})
-        print(Algorithm.__name__)
-        print('Cross validate parameters:', params)
-        print('average error:', avg_errors[i])
+                     'average_error': avg_errors[i],
+                     })
+        if avg_errors[i] < lowest_error:
+            lowest_error = avg_errors[i]
+            best_parameters = parameters[i]
 
     pprint.pprint(runs)
-    best_parameters = parameters[0]
+
     return best_parameters
 
 
@@ -76,7 +80,7 @@ if __name__ == '__main__':
                         help='Specify the train set size')
     parser.add_argument('--testsize', type=int, default=5000,
                         help='Specify the test set size')
-    parser.add_argument('--numruns', type=int, default=10,
+    parser.add_argument('--numruns', type=int, default=1,
                         help='Specify the number of runs')
     parser.add_argument('--dataset', type=str, default="susy",
                         help='Specify the name of the dataset')
@@ -89,12 +93,12 @@ if __name__ == '__main__':
 
     classalgs = {
         # 'Random': algs.Classifier,
-        # 'Naive Bayes': algs.NaiveBayes,
+         'Naive Bayes': algs.NaiveBayes,
         # 'Linear Regression': algs.LinearRegressionClass,
-        # 'Logistic Regression': algs.LogisticReg,
-        # 'Neural Network': algs.NeuralNet,
-        # 'Kernel Logistic Regression': algs.KernelLogisticRegression,
-         'Kernel Logistic Regression Census': algs.KernelLogisticRegressionCensus,
+         'Logistic Regression': algs.LogisticReg,
+         'Neural Network': algs.NeuralNet,
+         'Kernel Logistic Regression': algs.KernelLogisticRegression,
+        # 'Kernel Logistic Regression Census': algs.KernelLogisticRegressionCensus,
     }
     numalgs = len(classalgs)
 
@@ -114,7 +118,7 @@ if __name__ == '__main__':
             {'stepsize': 0.01},
         ],
         'Neural Network': [
-            #{'epochs': 100, 'nh': 4},  # MUST BE RUN ONE AT A TIME
+            {'epochs': 100, 'nh': 4},  # MUST BE RUN ONE AT A TIME
             #{'epochs': 100, 'nh': 8},
             #{'epochs': 100, 'nh': 16},
             #{'epochs': 100, 'nh': 32},
@@ -160,13 +164,19 @@ if __name__ == '__main__':
         best_parameters = {}
         for learnername, Learner in classalgs.items():
             params = parameters.get(learnername, [None])
-            best_parameters[learnername] = cross_validate(
-                5, Xtrain, Ytrain, Learner, params)
+            #best_parameters[learnername] = cross_validate(
+            #    5, Xtrain, Ytrain, Learner, params)
+            best_parameters[learnername] = cross_validate(2, Xtrain, Ytrain, Learner, params)
 
         for learnername, Learner in classalgs.items():
             params = best_parameters[learnername]
+            print(f'Best parameters for {learnername} :')
+            pprint.pprint(params)
             learner = Learner(params)
+            learner.learn(Xtrain, Ytrain)
+            errors[learnername] = geterror(Ytest, learner.predict(Xtest))
 
     for learnername in classalgs:
         aveerror = np.mean(errors[learnername])
-        print('Average error for ' + learnername + ': ' + str(aveerror))
+        stderror = np.std(errors[learnername])/np.sqrt(numruns)
+        print('Average error for ' + learnername + ': ' + str(aveerror) + '+-' + str(stderror))

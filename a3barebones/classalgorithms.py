@@ -201,13 +201,13 @@ class NeuralNet(Classifier):
 
                 for k in range(self.params['nh']):
                     delta_1 = yhat - ytrain[n]
-                    self.w1[k, 0] -= delta_1*h[k]
+                    self.w1[k, 0] -= self.params['stepsize']*delta_1*h[k]
 
                 for k in range(self.params['nh']):
                     for j in range(numfeatures):
                         delta_2[k] = (self.w1[k, 0] * delta_1)*h[k]*(1-h[k])
-                        self.w2[j, k] -= delta_2[k]*x[j]
-            print(i)
+                        self.w2[j, k] -= self.params['stepsize']*delta_2[k]*x[j]
+            print('NN epoch training:'+str(round(i/self.params['epochs']*100, 1))+'%')
 
     def predict(self, Xtest):
         numsamples = Xtest.shape[0]
@@ -255,7 +255,7 @@ class KernelLogisticRegression(LogisticReg):
         self.weights = None
 
     def learn(self, X, y):
-        print(X)
+        #print(X)
         numfeatures = X.shape[1]
         numsamples = X.shape[0]
 
