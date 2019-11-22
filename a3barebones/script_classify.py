@@ -54,6 +54,7 @@ def cross_validate(K, X, Y, Algorithm, parameters):
             print(f'{Algorithm.__name__} Cross validate parameters : {params} error: {all_errors[i, k]} run {k+1}/{K}, parameters {i+1}/{len(parameters)}')
     
     avg_errors = np.mean(all_errors, axis=1)
+    avg_std = np.std(all_errors, axis=1)/np.sqrt(K)
 
     runs = []
     lowest_error = np.inf
@@ -61,6 +62,7 @@ def cross_validate(K, X, Y, Algorithm, parameters):
     for i, params in enumerate(parameters):
         runs.append({'name': Algorithm.__name__, 'params': params,
                      'average_error': avg_errors[i],
+                     'standard_error': avg_std[i],
                      })
         if avg_errors[i] < lowest_error:
             lowest_error = avg_errors[i]
@@ -80,7 +82,7 @@ if __name__ == '__main__':
                         help='Specify the train set size')
     parser.add_argument('--testsize', type=int, default=5000,
                         help='Specify the test set size')
-    parser.add_argument('--numruns', type=int, default=10,
+    parser.add_argument('--numruns', type=int, default=1,
                         help='Specify the number of runs')
     parser.add_argument('--dataset', type=str, default="susy",
                         help='Specify the name of the dataset')
@@ -119,8 +121,8 @@ if __name__ == '__main__':
         ],
         'Neural Network': [
             {'epochs': 100, 'nh': 4},  # MUST BE RUN ONE AT A TIME
-            #{'epochs': 100, 'nh': 8},
-            #{'epochs': 100, 'nh': 16},
+            {'epochs': 100, 'nh': 8},
+            {'epochs': 100, 'nh': 16},
             #{'epochs': 100, 'nh': 32},
         ],
         'Kernel Logistic Regression': [
@@ -164,9 +166,7 @@ if __name__ == '__main__':
         best_parameters = {}
         for learnername, Learner in classalgs.items():
             params = parameters.get(learnername, [None])
-            best_parameters[learnername] = cross_validate(
-                5, Xtrain, Ytrain, Learner, params)
-            #best_parameters[learnername] = cross_validate(2, Xtrain, Ytrain, Learner, params)
+            best_parameters[learnername] = cross_validate(5, Xtrain, Ytrain, Learner, params)
 
         for learnername, Learner in classalgs.items():
             params = best_parameters[learnername]

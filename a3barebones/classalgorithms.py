@@ -192,7 +192,7 @@ class NeuralNet(Classifier):
         maxiter = self.params["epochs"]
 
         delta_1 = np.zeros((self.params['nh']))
-        delta_2 = np.zeros((numfeatures))
+        delta_2 = np.zeros((self.params['nh']))
 
         x_shuffle = np.concatenate([Xtrain, ytrain], axis=1)
         for i in range(maxiter):
