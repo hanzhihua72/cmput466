@@ -127,7 +127,7 @@ if __name__ == '__main__':
 
 # In[2]:
 
-
+'''
 import matplotlib as mpl 
 import matplotlib.pyplot as plt
 mpl.rc('figure',dpi=250)
@@ -146,7 +146,7 @@ plt.ylabel('Cost function')
 plt.plot(np.arange(len(batch_time)), batch_cost)
 
 print(len(batch_cost))
-
+'''
 
 # In[ ]:
 

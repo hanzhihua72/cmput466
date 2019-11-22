@@ -4,6 +4,8 @@ import MLCourse.dataloader as dtl
 import MLCourse.utilities as utils
 import classalgorithms as algs
 
+import pprint
+
 
 def getaccuracy(ytest, predictions):
     correct = 0
@@ -30,6 +32,7 @@ Check utilities.py for example usage.
 
 
 def cross_validate(K, X, Y, Algorithm, parameters):
+
     all_errors = np.zeros((len(parameters), K))
 
     for k in range(K):
@@ -50,10 +53,16 @@ def cross_validate(K, X, Y, Algorithm, parameters):
             all_errors[i, k] = geterror(ytest, predictions)
 
     avg_errors = np.mean(all_errors, axis=1)
+
+    runs = []
     for i, params in enumerate(parameters):
+        runs.append({'name': Algorithm.__name__, 'params': params,
+                     'average_error': avg_errors[i]})
+        print(Algorithm.__name__)
         print('Cross validate parameters:', params)
         print('average error:', avg_errors[i])
 
+    pprint.pprint(runs)
     best_parameters = parameters[0]
     return best_parameters
 
@@ -83,8 +92,8 @@ if __name__ == '__main__':
         # 'Naive Bayes': algs.NaiveBayes,
         # 'Linear Regression': algs.LinearRegressionClass,
         # 'Logistic Regression': algs.LogisticReg,
-        'Neural Network': algs.NeuralNet,
-        # 'Kernel Logistic Regression': algs.KernelLogisticRegression,
+        # 'Neural Network': algs.NeuralNet,
+         'Kernel Logistic Regression': algs.KernelLogisticRegression,
     }
     numalgs = len(classalgs)
 
@@ -101,12 +110,13 @@ if __name__ == '__main__':
         'Logistic Regression': [
             {'stepsize': 1},
             {'stepsize': 0.1},
+            {'stepsize': 0.01},
         ],
         'Neural Network': [
-            {'epochs': 100, 'nh': 4},
-            #    {'epochs': 100, 'nh': 8},
-            #    {'epochs': 100, 'nh': 16},
-            #    {'epochs': 100, 'nh': 32},
+            #{'epochs': 100, 'nh': 4},  # MUST BE RUN ONE AT A TIME
+            #{'epochs': 100, 'nh': 8},
+            #{'epochs': 100, 'nh': 16},
+            #{'epochs': 100, 'nh': 32},
         ],
         'Kernel Logistic Regression': [
             {'centers': 10, 'stepsize': 0.01},

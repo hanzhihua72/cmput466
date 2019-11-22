@@ -44,7 +44,7 @@ def load_blog(trainsize=5000, testsize=5000):
 
 def load_ctscan(trainsize=5000, testsize=5000):
     """ A CT scan dataset """
-    filename = 'datasets/slice_localization_data.csv'
+    filename = 'C:/Users/Zhi/Desktop/cmput466/a2barebones/datasets/slice_localization_data.csv'
     dataset = loadcsv(filename)
     trainset, testset = splitdataset(dataset,trainsize, testsize,featureoffset=1)
     return trainset,testset

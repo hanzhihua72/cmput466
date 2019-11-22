@@ -163,14 +163,13 @@ class NeuralNet(Classifier):
     def learn(self, Xtrain, ytrain):
         numfeatures = Xtrain.shape[1]
         numsamples = Xtrain.shape[0]
-        nh = self.params['nh']
 
-        self.w2 = np.random.randn(numfeatures, nh)
-        self.w1 = np.random.randn(nh, 1)
+        self.w2 = np.random.randn(numfeatures, self.params['nh'])
+        self.w1 = np.random.randn(self.params['nh'], 1)
 
         maxiter = self.params["epochs"]
 
-        delta_1 = np.zeros((nh))
+        delta_1 = np.zeros((self.params['nh']))
         delta_2 = np.zeros((numfeatures))
 
         x_shuffle = np.concatenate([Xtrain, ytrain], axis=1)
@@ -186,16 +185,15 @@ class NeuralNet(Classifier):
                 h = self.transfer(x @ self.w2)
                 yhat = self.transfer(h @ self.w1)
 
-                for k in range(nh):
+                for k in range(self.params['nh']):
                     delta_1 = yhat - ytrain[n]
                     self.w1[k, 0] -= delta_1*h[k]
 
-                for k in range(nh):
+                for k in range(self.params['nh']):
                     for j in range(numfeatures):
                         delta_2[k] = (self.w1[k, 0] * delta_1)*h[k]*(1-h[k])
                         self.w2[j, k] -= delta_2[k]*x[j]
-            if i % 20 == 0:
-                print(i)
+            print(i)
 
     def predict(self, Xtest):
         numsamples = Xtest.shape[0]
@@ -237,13 +235,51 @@ class KernelLogisticRegression(LogisticReg):
     def __init__(self, parameters={}):
         self.params = utils.update_dictionary_items({
             'stepsize': 0.01,
-            'epochs': 100,
+            'epochs': 1000,
             'centers': 10,
         }, parameters)
         self.weights = None
 
     def learn(self, X, y):
-        pass
+        numfeatures = X.shape[1]
+        numsamples = X.shape[0]
+
+        K = np.zeros((numsamples, self.params['centers']))
+        self.weights = np.random.randn(self.params['centers'], 1)
+        index = np.random.choice(numsamples, size=self.params['centers'])
+        self.centers = X[index].copy()
+        
+        for n in range(numsamples):
+            for i, C in enumerate(self.centers):
+                K[n, i] = X[n] @ C
+
+        assert ((K @ self.weights).shape == y.shape)
+
+        maxiter = self.params["epochs"]
+        for i in range(1, maxiter):
+            eta = self.params["stepsize"]/i
+            self.weights -= eta * \
+                K.T @ (utils.sigmoid(K @ self.weights) - y)
+        
 
     def predict(self, Xtest):
-        pass
+        numsamples = Xtest.shape[0]
+        numfeatures = Xtest.shape[1]
+        predictions = []
+
+        K = np.zeros((numsamples, self.params['centers']))
+
+        for n in range(numsamples):
+            for i, C in enumerate(self.centers):
+                K[n, i] = Xtest[n] @ C
+
+        for n in range(numsamples):
+            prob = utils.sigmoid(K[n] @ self.weights)
+            if prob < 0.5:
+                predictions.append(0)
+            else:
+                predictions.append(1)
+
+        return np.reshape(predictions, [numsamples, 1])
+
+
