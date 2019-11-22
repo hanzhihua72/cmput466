@@ -70,7 +70,7 @@ def cross_validate(K, X, Y, Algorithm, parameters):
 
     pprint.pprint(runs)
 
-    return best_parameters
+    return best_parameters, runs
 
 
 if __name__ == '__main__':
@@ -164,9 +164,12 @@ if __name__ == '__main__':
         Ytest = np.reshape(Ytest, [len(Ytest), 1])
 
         best_parameters = {}
+        runs = []
         for learnername, Learner in classalgs.items():
             params = parameters.get(learnername, [None])
-            best_parameters[learnername] = cross_validate(5, Xtrain, Ytrain, Learner, params)
+            best_parameters[learnername], runs_i = cross_validate(5, Xtrain, Ytrain, Learner, params)
+            runs.append(runs_i)
+        pprint.pprint(runs)
 
         for learnername, Learner in classalgs.items():
             params = best_parameters[learnername]
