@@ -80,7 +80,7 @@ if __name__ == '__main__':
                         help='Specify the train set size')
     parser.add_argument('--testsize', type=int, default=5000,
                         help='Specify the test set size')
-    parser.add_argument('--numruns', type=int, default=1,
+    parser.add_argument('--numruns', type=int, default=10,
                         help='Specify the number of runs')
     parser.add_argument('--dataset', type=str, default="susy",
                         help='Specify the name of the dataset')
@@ -164,9 +164,9 @@ if __name__ == '__main__':
         best_parameters = {}
         for learnername, Learner in classalgs.items():
             params = parameters.get(learnername, [None])
-            #best_parameters[learnername] = cross_validate(
-            #    5, Xtrain, Ytrain, Learner, params)
-            best_parameters[learnername] = cross_validate(2, Xtrain, Ytrain, Learner, params)
+            best_parameters[learnername] = cross_validate(
+                5, Xtrain, Ytrain, Learner, params)
+            #best_parameters[learnername] = cross_validate(2, Xtrain, Ytrain, Learner, params)
 
         for learnername, Learner in classalgs.items():
             params = best_parameters[learnername]

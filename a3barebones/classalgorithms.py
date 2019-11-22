@@ -83,6 +83,10 @@ class NaiveBayes(Classifier):
         if ytrain.shape[1] == 1:
             self.numclasses = 2
             numsamples = Xtrain.shape[0]
+
+            if self.params['usecolumnones']:
+                Xtrain = np.concatenate([np.ones((numsamples, 1)), Xtrain], axis=1)
+
             numfeatures = Xtrain.shape[1]
 
             # print(Xtrain.shape, ytrain.shape)
@@ -110,6 +114,10 @@ class NaiveBayes(Classifier):
 
     def predict(self, Xtest):
         numsamples = Xtest.shape[0]
+
+        if self.params['usecolumnones']:
+            Xtest = np.concatenate([np.ones((numsamples, 1)), Xtest], axis=1)
+
         numfeatures = Xtest.shape[1]
         predictions = []
 
