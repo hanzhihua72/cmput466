@@ -93,7 +93,8 @@ if __name__ == '__main__':
         # 'Linear Regression': algs.LinearRegressionClass,
         # 'Logistic Regression': algs.LogisticReg,
         # 'Neural Network': algs.NeuralNet,
-         'Kernel Logistic Regression': algs.KernelLogisticRegression,
+        # 'Kernel Logistic Regression': algs.KernelLogisticRegression,
+         'Kernel Logistic Regression Census': algs.KernelLogisticRegressionCensus,
     }
     numalgs = len(classalgs)
 
@@ -123,7 +124,13 @@ if __name__ == '__main__':
             {'centers': 20, 'stepsize': 0.01},
             {'centers': 40, 'stepsize': 0.01},
             {'centers': 80, 'stepsize': 0.01},
-        ]
+        ],
+        'Kernel Logistic Regression Census': [
+            {'centers': 10, 'stepsize': 0.01},
+            {'centers': 20, 'stepsize': 0.01},
+            {'centers': 40, 'stepsize': 0.01},
+            {'centers': 80, 'stepsize': 0.01},
+        ],
     }
 
     # initialize the errors for each parameter setting to 0
